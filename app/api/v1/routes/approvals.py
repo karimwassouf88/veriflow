@@ -7,15 +7,16 @@ from app.db.session import get_db
 from app.models.user import User, UserRole
 from app.models.approval import Approval, ApprovalDecision
 from app.models.audit_log import ActorType
-from app.schemas.approval import ApprovalOut, ApprovalDecisionRequest
+from app.schemas.approval import ApprovalOut, ApprovalDecisionRequest, ApprovalWithDocumentOut
 from app.api.v1.deps import require_role
 from app.services import audit_service
+from app.models.document import Document
 
 router = APIRouter(prefix="/approvals", tags=["approvals"])
 APPROVER_ROLES = (UserRole.ADMIN, UserRole.APPROVER)
 ALL_ROLES = (UserRole.ADMIN, UserRole.CLERK, UserRole.APPROVER, UserRole.AUDITOR)
 
-@router.get("", response_model=list[ApprovalOut])
+@router.get("", response_model=list[ApprovalWithDocumentOut])
 def list_approvals(
     pending_only: bool = True,
     db: Session = Depends(get_db),
@@ -24,7 +25,20 @@ def list_approvals(
     query = select(Approval).order_by(Approval.created_at.desc())
     if pending_only:
         query = query.where(Approval.decision == ApprovalDecision.PENDING.value)
-    return db.scalars(query).all()
+    approvals = db.scalars(query).all()
+
+    doc_ids = {a.document_id for a in approvals}
+    documents = {d.id: d for d in db.scalars(select(Document).where(Document.id.in_(doc_ids))).all()} if doc_ids else {}
+
+    return [
+        ApprovalWithDocumentOut(
+            id=a.id, document_id=a.document_id, decision=a.decision, routing_reason=a.routing_reason,
+            approver_id=a.approver_id, comment=a.comment, decided_at=a.decided_at, created_at=a.created_at,
+            document_filename=documents[a.document_id].original_filename if a.document_id in documents else None,
+            document_type=documents[a.document_id].type.value if a.document_id in documents else None,
+        )
+        for a in approvals
+    ]
 
 @router.post("/{approval_id}/decision", response_model=ApprovalOut)
 def decide_approval(

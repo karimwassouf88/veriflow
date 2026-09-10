@@ -17,6 +17,10 @@ from app.services import validation_service
 from app.schemas.validation import ValidationResultOut
 from app.agents import graph
 from app.models.approval import Approval
+from app.models.validation_result import ValidationResult
+from app.models.compliance_result import ComplianceResult
+from app.schemas.compliance import ComplianceResultOut
+from app.schemas.approval import ApprovalOut
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 
@@ -156,3 +160,35 @@ def process_document_route(
         "approval_reason": latest_approval.routing_reason if latest_approval else None,
         "error": final_state.get("error"),
     }
+
+def _latest_result(db: Session, model, document_id: uuid.UUID):
+    return db.scalars(
+        select(model).where(model.document_id == document_id).order_by(model.created_at.desc())
+    ).first()
+
+@router.get("/{document_id}/validation", response_model=ValidationResultOut)
+def get_validation_result(document_id: uuid.UUID, db: Session = Depends(get_db), current_user: User = Depends(require_role(*ALL_ROLES))):
+    if db.get(Document, document_id) is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Document not found")
+    result = _latest_result(db, ValidationResult, document_id)
+    if result is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No validation result yet")
+    return result
+
+@router.get("/{document_id}/compliance", response_model=ComplianceResultOut)
+def get_compliance_result(document_id: uuid.UUID, db: Session = Depends(get_db), current_user: User = Depends(require_role(*ALL_ROLES))):
+    if db.get(Document, document_id) is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Document not found")
+    result = _latest_result(db, ComplianceResult, document_id)
+    if result is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No compliance result yet")
+    return result
+
+@router.get("/{document_id}/approval", response_model=ApprovalOut)
+def get_approval_result(document_id: uuid.UUID, db: Session = Depends(get_db), current_user: User = Depends(require_role(*ALL_ROLES))):
+    if db.get(Document, document_id) is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Document not found")
+    result = _latest_result(db, Approval, document_id)
+    if result is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No approval decision yet")
+    return result

@@ -18,3 +18,8 @@ class ApprovalOut(BaseModel):
 class ApprovalDecisionRequest(BaseModel):
     decision: ApprovalDecision
     comment: str | None = None
+
+
+class ApprovalWithDocumentOut(ApprovalOut):
+    document_filename: str | None = None
+    document_type: str | None = None
