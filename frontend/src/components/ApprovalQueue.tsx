@@ -62,7 +62,7 @@ export default function ApprovalQueue({
                 onChange={(e) =>
                   setComments((prev) => ({ ...prev, [a.id]: e.target.value }))
                 }
-                className="flex-1 min-w-[180px] rounded-md border border-slate-300 px-3 py-1.5 text-sm"
+                className="text-slate-900 flex-1 min-w-45 rounded-md border border-slate-300 px-3 py-1.5 text-sm"
               />
               <button
                 onClick={() => decide(a.id, "approved")}

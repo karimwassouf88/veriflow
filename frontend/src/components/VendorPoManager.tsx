@@ -79,13 +79,13 @@ export default function VendorPoManager({
             placeholder="Vendor name"
             value={vendorName}
             onChange={(e) => setVendorName(e.target.value)}
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900"
           />
           <input
             placeholder="Tax ID (optional)"
             value={vendorTaxId}
             onChange={(e) => setVendorTaxId(e.target.value)}
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900"
           />
           <button
             type="submit"
@@ -121,7 +121,7 @@ export default function VendorPoManager({
             placeholder="PO number"
             value={poNumber}
             onChange={(e) => setPoNumber(e.target.value)}
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900"
           />
           <select
             required
@@ -143,7 +143,7 @@ export default function VendorPoManager({
             placeholder="Amount"
             value={poAmount}
             onChange={(e) => setPoAmount(e.target.value)}
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900"
           />
           <button
             type="submit"

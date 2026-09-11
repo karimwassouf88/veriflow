@@ -29,7 +29,7 @@ export default function PolicySearchBox() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="e.g. What's the approval threshold for a $15,000 purchase?"
-          className="flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm"
+          className="flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900"
         />
         <button
           type="submit"

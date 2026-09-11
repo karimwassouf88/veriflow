@@ -65,7 +65,7 @@ export default function UploadForm() {
           accept="application/pdf"
           required
           onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-          className="text-sm"
+          className="text-sm text-slate-900"
         />
       </div>
       {error && <p className="text-sm text-red-600">{error}</p>}
